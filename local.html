@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background-image: url("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg?semt=ais_hybrid&w=740");
+            background-size: cover;
+            background-repeat: no-repeat;
+            justify-items: center;
+            align-content: center;
+            height: 700px;
+
+        }
+
+
+        input {
+            border-radius: 10px;
+            height: 30px;
+            width: 80%;
+            padding: 5px;
+            border: none
+        }
+
+        .parent {
+            height: 400px;
+            width: 400px;
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            margin: auto;
+            gap: 20px;
+            border-radius: 10px;
+            border: 1px solid;
+
+
+
+        }
+
+        h1 {
+            color: white;
+            margin-top: 50px;
+        }
+
+        .taskContainer {
+            border: 2px solid white;
+            width: 80%;
+            border-radius: 10px;
+            padding: 10px;
+            overflow: scroll;
+            scrollbar-width: none;
+            margin-bottom: 20px;
+
+
+        }
+
+        button {
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-top: 5px;
+        }
+
+        li {
+            list-style: none;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-transform: capitalize;
+
+        }
+
+        button:hover {
+            color: white;
+            background-color: black;
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="parent">
+        <h1>TO Do List</h1>
+        <input type="text" id="inputtask">
+        <div>
+            <button onclick="insert()">Add Task</button>
+            <button onclick="reset()">Reset Task</button>
+            <button onclick="update()">Edit Task</button>
+        </div>
+
+
+        <div class="taskContainer"></div>
+    </div>
+
+
+
+    <script>
+        let inputs = document.getElementById("inputtask");
+
+        // Load tasks from localStorage on page load
+        window.onload = function () {
+            let savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            savedTasks.forEach(taskText => {
+                createTaskElement(taskText);
+            });
+        };
+
+        function insert() {
+            if (inputs.value === "") {
+                alert('Enter Your Task');
+            } else {
+                createTaskElement(inputs.value);
+                saveTaskToLocalStorage(inputs.value);
+                inputs.value = "";
+            }
+        }
+
+        function reset() {
+            let reset = document.querySelector(".taskContainer");
+            reset.innerHTML = "";
+            inputs.value = "";
+            localStorage.removeItem("tasks");
+        }
+
+        function update() {
+            const taskupdate = document.querySelectorAll(".taskContainer li");
+            taskupdate.forEach(t => {
+                t.contentEditable = t.isContentEditable ? "false" : "true";
+                t.style.border = t.isContentEditable ? "none" : "1px dashed white";
+            });
+        }
+
+        function createTaskElement(taskText) {
+            let newElement = document.createElement("li");
+            newElement.innerHTML = `${taskText} <button>Delete</button>`;
+            let container = document.querySelector('.taskContainer');
+            container.append(newElement);
+
+            // Add delete event
+            newElement.querySelector("button").addEventListener("click", () => {
+                newElement.remove();
+                deleteTaskFromLocalStorage(taskText);
+            });
+
+            // Optional: enable inline editing on double click
+            newElement.addEventListener("dblclick", () => {
+                newElement.contentEditable = newElement.isContentEditable ? "false" : "true";
+                newElement.style.border = newElement.isContentEditable ? "none" : "1px dashed white";
+            });
+        }
+
+        function saveTaskToLocalStorage(taskText) {
+            let savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            savedTasks.push(taskText);
+            localStorage.setItem("tasks", JSON.stringify(savedTasks));
+        }
+
+        function deleteTaskFromLocalStorage(taskText) {
+            let savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+            savedTasks = savedTasks.filter(task => task !== taskText);
+            localStorage.setItem("tasks", JSON.stringify(savedTasks));
+        }
+    </script>
+
+</body>
+
+</html>
