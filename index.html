@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do List</title>
+  <style>
+    body {
+      background-image: url("https://img.freepik.com/free-vector/dark-hexagonal-background-with-gradient-color_79603-1409.jpg?semt=ais_hybrid&w=740");
+      background-size: cover;
+      background-repeat: repeat;
+      justify-items: center;
+      align-content: center;
+      height: 700px;
+      position: relative;
+      background-color: black;
+    }
+
+    input {
+      border-radius: 10px;
+      height: 30px;
+      width: 80%;
+      padding: 5px;
+      border: none;
+    }
+
+    .parent {
+      height: 400px;
+      width: 400px;
+      backdrop-filter: blur(5px);
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      margin: auto;
+      gap: 20px;
+      border-radius: 10px;
+      border: 1px solid;
+    }
+
+    h1 {
+      color: white;
+      margin-top: 50px;
+    }
+
+    .taskContainer {
+      border: 2px solid white;
+      width: 80%;
+      border-radius: 10px;
+      padding: 10px;
+      overflow: scroll;
+      scrollbar-width: none;
+      margin-bottom: 20px;
+    }
+
+    .taskContainer::-webkit-scrollbar,
+    .taskContainers::-webkit-scrollbar {
+      display: none;
+    }
+
+    button {
+      border-radius: 5px;
+      padding: 5px 10px;
+      margin-top: 5px;
+    }
+
+    li {
+      list-style: none;
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      text-transform: capitalize;
+    }
+
+    button:hover {
+      color: white;
+      background-color: black;
+    }
+
+    .follow {
+      height: 20px;
+      width: 20px;
+      background-color: aqua;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      position: absolute;
+      z-index: 10;
+    }
+
+    .week {
+      margin: 100px auto;
+      display: flex;
+      gap: 40px;
+      position: relative;
+
+    }
+
+    h2 {
+      text-align: center;
+    }
+
+    .taskContainers {
+
+      border: solid;
+      color: white;
+      width: 200px;
+      height: 300px;
+      padding: 20px;
+      border-radius: 10px;
+      overflow: scroll;
+      
+      
+    }
+
+
+
+    @media screen and (max-width:600px) {
+      .week {
+
+        display: block;
+        width: 100%;
+
+
+
+      }
+
+      .taskContainers {
+        margin: 20px auto;
+      }
+
+
+
+    }
+  </style>
+</head>
+
+<body>
+  <div class="follow"></div>
+  <div class="parent">
+    <h1>To Do List</h1>
+    <input type="text" id="inputtask" />
+    <div>
+      <button onclick="insert()">Add Task</button>
+      <button onclick="reset()">Reset Task</button>
+      <button onclick="update()">Edit Task</button>
+    </div>
+    <div class="taskContainer"></div>
+  </div>
+
+  <div class="week">
+    <div class="taskContainers" id="monday">
+      <h2>Monday</h2>
+    </div>
+    <div class="taskContainers" id="tuesday">
+      <h2>Tuesday</h2>
+    </div>
+    <div class="taskContainers" id="wednesday">
+      <h2>Wednesday</h2>
+    </div>
+    <div class="taskContainers" id="thursday">
+      <h2>Thursday</h2>
+    </div>
+    <div class="taskContainers" id="friday">
+      <h2>Friday</h2>
+    </div>
+  </div>
+
+  <script>
+    let follow = document.querySelector(".follow");
+
+    document.addEventListener("mousemove", (e) => {
+      let { clientX, clientY } = e;
+      follow.style.transform = `translate(${clientX}px,${clientY}px)`;
+    });
+
+    // Insert a new task
+    let inputs = document.getElementById("inputtask");
+
+    function insert() {
+      if (inputs.value == "") {
+        alert("Enter Your Task");
+      } else {
+        let newElement = document.createElement("li");
+        newElement.setAttribute("draggable", "true");
+        newElement.setAttribute("class", "lists");
+
+        newElement.innerHTML = `${inputs.value} <button contentEditable="false">Delete</button>`;
+
+        let container = document.querySelector(".taskContainer");
+        container.append(newElement);
+        inputs.value = "";
+
+        newElement.querySelector("button").addEventListener("click", () => {
+          newElement.remove();
+        });
+
+        let selected = null;
+
+        // Add drag event listeners to tasks
+        let lists = document.getElementsByClassName("lists");
+        for (let list of lists) {
+          list.addEventListener("dragstart", function (e) {
+            selected = e.target;
+          });
+        }
+
+
+        // let tasks= document.getElementsByClassName("taskContainers");
+        // for (let task of tasks)
+        // {
+        //     task.addEventListener("dragover",function(e){
+        //         e.preventDefault();
+        //     });
+
+        //     task.addEventListener("drop",function(){
+        //       if(selected)
+        //       {
+        //         task.appendChild(selected);
+        //       }
+        //     });
+
+        // }
+
+
+
+        // Allow dropping into week columns
+        document.querySelectorAll('.taskContainers').forEach((box) => {
+          box.addEventListener('dragover', function (e) {
+            e.preventDefault();
+          });
+
+          box.addEventListener('drop', function () {
+            if (selected) {
+              box.appendChild(selected);
+              selected = null;
+            }
+          });
+        });
+      }
+    }
+
+    // Reset all tasks
+    function reset() {
+      let reset = document.querySelector(".taskContainer");
+      let resetall = document.querySelectorAll(".taskContainers li ");
+      for (let resets of resetall) {
+        resets.innerHTML = "";
+      }
+      reset.innerHTML = "";
+      inputs.value = "";
+    }
+
+    // Update task 
+    function update() {
+      const taskupdate = document.querySelectorAll(".taskContainer li");
+
+      taskupdate.forEach((t) => {
+        t.contentEditable = t.isContentEditable ? "false" : "true";
+      });
+    }
+  </script>
+</body>
+
+</html>
